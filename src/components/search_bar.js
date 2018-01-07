@@ -3,23 +3,24 @@ import React, { Component } from 'react';
 class SearchBar extends Component {
   constructor(props) {
     super(props);
-    this.onInputChange = this.onInputChange.bind(this);
+
+    this.state = { term: ''};
   }
 
   render() {
     return (
-      <form className='search-bar' onSubmit={this.props.doSearch}>
+      <div className='search-bar'>
         <input
-          onChange={this.onInputChange}
-          value={this.props.searchText}
+          value={this.state.term}
+          onChange={event => this.onInputChange(event.target.value)}
         />
-      <input type="submit" value="Search" />
-      </form>
+    </div>
     );
   }
 
-  onInputChange(event) {
-    this.props.onSearchTextChange(event.target.value);
+  onInputChange(term) {
+    this.setState({term});
+    this.props.onSearchTermChange(term);
   }
 }
 

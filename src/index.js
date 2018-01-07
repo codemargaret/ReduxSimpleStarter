@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import YTSearch from 'youtube-api-search';
@@ -13,26 +14,32 @@ class App extends Component {
 
     this.state = {
       videos: [],
-      searchText: 'goats',
       selectedVideo: null
-     };
+    };
 
-    this.search = this.search.bind(this);
-    this.onSearchTextChange = this.onSearchTextChange.bind(this);
-    this.onVideoSelect = this.onVideoSelect.bind(this);
+    this.videoSearch('goats');
+
+  }
+
+  videoSearch(term){
+    YTSearch({key: API_KEY, term:term}, (videos) => {
+      this.setState({
+        videos:videos,
+        selectedVideo: videos[0]
+      });
+    });
   }
 
   render() {
+    const videoSearch = _.debounce((term) => { this.videoSearch(term) }, 300);
+
     return (
       <div className='app'>
         <SearchBar
-          searchText={this.state.searchText}
-          onSearchTextChange={this.onSearchTextChange}
-          searchPostfix={this.state.searchPostfix}
-          doSearch={this.search}
+          onSearchTermChange = {videoSearch}
         />
         <VideoList
-          videos={this.state.videos} onVideoSelect={this.onVideoSelect} />
+          videos={this.state.videos} onVideoSelect={selectedVideo => this.setState({selectedVideo})} />
         <VideoDetail video={this.state.selectedVideo} />
       </div>
     );
@@ -47,13 +54,13 @@ class App extends Component {
     });
   }
 
-  onSearchTextChange(searchText) {
-    this.setState({searchText});
-  }
-
-  onVideoSelect(selectedVideo) {
-    this.setState({selectedVideo})
-  }
+  // onSearchTextChange(searchText) {
+  //   this.setState({searchText});
+  // }
+  //
+  // onVideoSelect(selectedVideo) {
+  //   this.setState({selectedVideo});
+  // }
 }
 
 //Take this component's generated HTML and put it on the page(in the DOM).
