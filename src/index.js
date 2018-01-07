@@ -13,28 +13,46 @@ class App extends Component {
 
     this.state = {
       videos: [],
+      searchText: 'goats',
       selectedVideo: null
      };
 
-    YTSearch({key: API_KEY, term: 'surfboards'}, (videos) => {
-      this.setState({
-        videos: videos,
-        selectedVideo: videos[0]
-      });
-      // same as: this.setState({videos: videos });
-    });
+    this.search = this.search.bind(this);
+    this.onSearchTextChange = this.onSearchTextChange.bind(this);
+    this.onVideoSelect = this.onVideoSelect.bind(this);
   }
 
   render() {
     return (
-      <div>
-        <SearchBar />
-        <VideoDetail video={this.state.selectedVideo} />
+      <div className='app'>
+        <SearchBar
+          searchText={this.state.searchText}
+          onSearchTextChange={this.onSearchTextChange}
+          searchPostfix={this.state.searchPostfix}
+          doSearch={this.search}
+        />
         <VideoList
-          onVideoSelect={selectedVideo => this.setState({selectedVideo})}
-          videos={this.state.videos} />
+          videos={this.state.videos} onVideoSelect={this.onVideoSelect} />
+        <VideoDetail video={this.state.selectedVideo} />
       </div>
     );
+  }
+
+  search(event) {
+    event.preventDefault();
+    const searchTerm = `${this.state.searchText} ${this.state.searchPostfix}`;
+    YTSearch({key: API_KEY, term: searchTerm}, videos => {
+      const selectedVideo = videos[0]
+      this.setState({videos, selectedVideo})
+    });
+  }
+
+  onSearchTextChange(searchText) {
+    this.setState({searchText});
+  }
+
+  onVideoSelect(selectedVideo) {
+    this.setState({selectedVideo})
   }
 }
 
